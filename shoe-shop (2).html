@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Каталог взуття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#26211C;
+    --paper:#E4DCC8;
+    --paper-2:#DCD2B8;
+    --card:#FAF6EC;
+    --brass:#A87C2C;
+    --brass-dark:#7A5A1E;
+    --rust:#9B4430;
+    --sage:#5C6B4A;
+    --line:#C9BFA4;
+    --line-strong:#B0A487;
+    --muted:#7A7263;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      radial-gradient(var(--paper-2) 1px, transparent 1px);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .slab{font-family:'Zilla Slab',serif;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 120px;}
+
+  header.shop-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:16px;flex-wrap:wrap;
+    padding-bottom:20px;margin-bottom:26px;
+    border-bottom:3px double var(--line-strong);
+  }
+  .shop-name{
+    font-family:'Zilla Slab',serif;font-weight:700;
+    font-size:clamp(28px,5vw,42px);letter-spacing:.2px;margin:0;
+  }
+  .shop-tagline{margin:6px 0 0;color:var(--muted);font-size:15px;}
+  .head-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .btn{
+    border:1.5px solid var(--ink);background:transparent;color:var(--ink);
+    padding:9px 16px;border-radius:3px;font-size:14px;font-weight:500;
+    transition:background .15s,color .15s;
+  }
+  .btn:hover{background:var(--ink);color:var(--card);}
+  .btn.primary{background:var(--rust);border-color:var(--rust);color:#fff;}
+  .btn.primary:hover{background:#7f3624;border-color:#7f3624;}
+  .btn.ghost{border-color:var(--line-strong);color:var(--muted);}
+  .btn.ghost:hover{background:var(--line);color:var(--ink);}
+  .btn.small{padding:6px 11px;font-size:12.5px;}
+  .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--brass);outline-offset:2px;
+  }
+
+  .controls{
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px;
+  }
+  .search-input{
+    flex:1;min-width:180px;padding:10px 12px;border:1.5px solid var(--line-strong);
+    border-radius:3px;background:var(--card);font-size:14px;color:var(--ink);
+  }
+  .chip{
+    padding:7px 13px;border:1.5px solid var(--line-strong);border-radius:20px;
+    background:transparent;font-size:13px;color:var(--muted);
+  }
+  .chip.active{background:var(--ink);border-color:var(--ink);color:var(--card);}
+  .toggle-sold{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);}
+
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:22px;
+  }
+
+  .card{
+    position:relative;background:var(--card);
+    border:1.5px dashed var(--line-strong);border-radius:6px;
+    padding:16px 16px 14px;
+    box-shadow:2px 3px 0 rgba(38,33,28,.08);
+  }
+  .card::before{
+    content:"";position:absolute;top:-9px;left:22px;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--paper);border:1.5px dashed var(--line-strong);
+  }
+  .photo-box{position:relative;margin-bottom:12px;}
+  .card-photo{
+    width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;
+    background:var(--paper-2);display:block;
+    border:1px solid var(--line);
+  }
+  .card-photo.empty{
+    display:flex;align-items:center;justify-content:center;color:var(--muted);
+    font-size:13px;
+  }
+  .photo-nav{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border-radius:50%;border:none;
+    background:rgba(38,33,28,.55);color:#fff;font-size:14px;
+    display:flex;align-items:center;justify-content:center;line-height:0;
+  }
+  .photo-nav.prev{left:6px;}
+  .photo-nav.next{right:6px;}
+  .photo-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;}
+  .photo-dots span{width:6px;height:6px;border-radius:50%;background:#fff;opacity:.4;}
+  .card-title{font-family:'Zilla Slab',serif;font-weight:600;font-size:19px;margin:0 0 4px;}
+  .card-desc{font-size:13.5px;color:var(--muted);margin:0 0 12px;line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .card-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .card-price{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:17px;color:var(--brass-dark);}
+  .card-size{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted);
+    border:1px solid var(--line-strong);padding:3px 8px;border-radius:3px;}
+  .card-cat{font-size:11.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--sage);margin-top:8px;}
+  .stamp{
+    position:absolute;top:14px;right:14px;z-index:2;
+    font-family:'Zilla Slab',serif;font-weight:700;font-size:13px;
+    color:var(--rust);border:2px solid var(--rust);border-radius:4px;
+    padding:2px 8px;transform:rotate(-9deg);letter-spacing:1px;
+    background:rgba(250,246,236,.85);
+  }
+  .card-admin-row{display:flex;gap:8px;margin-top:12px;border-top:1px dashed var(--line);padding-top:10px;}
+
+  .empty-state{
+    text-align:center;padding:60px 20px;color:var(--muted);
+  }
+  .empty-state h3{font-family:'Zilla Slab',serif;color:var(--ink);font-size:22px;margin:0 0 8px;}
+
+  .dock{
+    position:fixed;bottom:20px;right:20px;display:flex;gap:10px;flex-wrap:wrap;
+    max-width:calc(100vw - 40px);justify-content:flex-end;z-index:40;
+  }
+  .dock .btn{box-shadow:2px 3px 0 rgba(38,33,28,.15);}
+
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(38,33,28,.5);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;
+  }
+  .modal{
+    background:var(--card);border-radius:8px;max-width:460px;width:100%;
+    max-height:88vh;overflow-y:auto;padding:24px 24px 22px;
+    border:1px solid var(--line-strong);
+  }
+  .modal h2{font-family:'Zilla Slab',serif;margin:0 0 4px;font-size:22px;}
+  .modal .sub{color:var(--muted);font-size:13.5px;margin:0 0 18px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;color:var(--ink);}
+  .field .hint{font-size:12px;color:var(--muted);margin-top:4px;}
+  input[type=text],input[type=password],input[type=url],textarea,select{
+    width:100%;padding:10px 11px;border:1.5px solid var(--line-strong);
+    border-radius:4px;font-size:14px;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:72px;}
+  .row2{display:flex;gap:10px;}
+  .row2 > .field{flex:1;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+  .err{color:var(--rust);font-size:13px;margin-top:4px;min-height:16px;}
+  .photo-drop{
+    border:1.5px dashed var(--line-strong);border-radius:6px;padding:14px;
+    text-align:center;color:var(--muted);font-size:13px;cursor:pointer;
+    background:var(--paper);
+  }
+  .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;margin-bottom:8px;}
+  .thumb-item{position:relative;}
+  .thumb-item img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:4px;border:1px solid var(--line);display:block;}
+  .thumb-remove{
+    position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;
+    background:var(--rust);color:#fff;border:none;font-size:12px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .loading{text-align:center;padding:80px 20px;color:var(--muted);font-size:14px;}
+
+  .card-photo:not(.empty){cursor:zoom-in;}
+  .lightbox-bg{
+    position:fixed;inset:0;background:rgba(20,17,14,.92);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;z-index:200;
+  }
+  .lightbox-img-wrap{position:relative;max-width:min(900px,94vw);max-height:88vh;}
+  .lightbox-img{
+    display:block;max-width:min(900px,94vw);max-height:88vh;
+    width:auto;height:auto;border-radius:6px;object-fit:contain;
+  }
+  .lightbox-close{
+    position:absolute;top:-14px;right:-14px;width:34px;height:34px;border-radius:50%;
+    background:var(--card);border:1.5px solid var(--line-strong);color:var(--ink);
+    font-size:18px;display:flex;align-items:center;justify-content:center;line-height:0;
+  }
+  .lightbox-nav{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:42px;height:42px;border-radius:50%;border:none;
+    background:rgba(38,33,28,.6);color:#fff;font-size:22px;
+    display:flex;align-items:center;justify-content:center;line-height:0;
+  }
+  .lightbox-nav.prev{left:-8px;}
+  .lightbox-nav.next{right:-8px;}
+  .lightbox-count{
+    position:absolute;bottom:-30px;left:0;right:0;text-align:center;
+    color:#fff;font-size:13px;opacity:.8;
+  }
+  @media (max-width:640px){
+    .lightbox-nav.prev{left:4px;}
+    .lightbox-nav.next{right:4px;}
+    .lightbox-close{top:6px;right:6px;}
+  }
+
+  @media (max-width:480px){
+    .wrap{padding:20px 14px 120px;}
+    .row2{flex-direction:column;gap:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading" id="loading">Відкриваємо каталог…</div>
+</div>
+
+<script>
+const STORE_TITLE_KEY = 'shop-settings';
+const INDEX_KEY = 'product-index';
+const productKey = id => 'product:' + id;
+
+let settings = null;
+let index = [];
+let products = {};
+let isAdmin = false;
+let editingId = null;
+let filterCat = 'Всі';
+let showSold = true;
+let searchQ = '';
+let pendingPhotos = [];
+let cardPhotoIndex = {};
+
+const app = document.getElementById('app');
+
+async function storeGet(key){
+  try{
+    const r = await window.storage.get(key, true);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function storeSet(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), true); }catch(e){ console.error('storage set failed', e); }
+}
+async function storeDelete(key){
+  try{ await window.storage.delete(key, true); }catch(e){}
+}
+async function hashPass(pw){
+  const enc = new TextEncoder().encode(pw);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function uid(){
+  return (crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.random().toString(16).slice(2));
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function getPhotos(p){
+  if(p.photos && p.photos.length) return p.photos;
+  if(p.photo) return [p.photo];
+  return [];
+}
+
+async function boot(){
+  settings = await storeGet(STORE_TITLE_KEY);
+  if(!settings){
+    renderSetup();
+    return;
+  }
+  index = await storeGet(INDEX_KEY) || [];
+  await loadAllProducts();
+  render();
+}
+
+async function loadAllProducts(){
+  products = {};
+  for(const id of index){
+    const p = await storeGet(productKey(id));
+    if(p) products[id] = p;
+  }
+}
+
+function renderSetup(){
+  app.innerHTML = `
+    <div style="max-width:440px;margin:60px auto;background:var(--card);border:1px solid var(--line-strong);border-radius:8px;padding:28px 26px;">
+      <h1 class="slab" style="font-size:24px;margin:0 0 4px;">Створення каталогу</h1>
+      <p style="color:var(--muted);font-size:13.5px;margin:0 0 20px;">Схоже, сайт відкривають вперше. Задайте назву і спільний пароль — він знадобиться, щоб додавати й редагувати товари.</p>
+      <div class="field">
+        <label for="s-name">Назва каталогу</label>
+        <input type="text" id="s-name" placeholder="Наприклад: Взуття від Світлани">
+      </div>
+      <div class="field">
+        <label for="s-tag">Короткий опис (необов'язково)</label>
+        <input type="text" id="s-tag" placeholder="Наприклад: вживане і нове взуття в хорошому стані">
+      </div>
+      <div class="field">
+        <label for="s-contact">Посилання для зв'язку (необов'язково)</label>
+        <input type="url" id="s-contact" placeholder="https://wa.me/380... або https://t.me/imya">
+        <div class="hint">Покажемо кнопку «Написати» на сайті, якщо заповните.</div>
+      </div>
+      <div class="field">
+        <label for="s-pass">Спільний пароль (для вас і мами)</label>
+        <input type="password" id="s-pass" placeholder="Придумайте пароль">
+      </div>
+      <div class="field">
+        <label for="s-pass2">Повторіть пароль</label>
+        <input type="password" id="s-pass2" placeholder="Ще раз">
+      </div>
+      <div class="err" id="s-err"></div>
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn primary" id="s-save">Створити каталог</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('s-save').onclick = async () => {
+    const name = document.getElementById('s-name').value.trim();
+    const tag = document.getElementById('s-tag').value.trim();
+    const contact = document.getElementById('s-contact').value.trim();
+    const pass = document.getElementById('s-pass').value;
+    const pass2 = document.getElementById('s-pass2').value;
+    const err = document.getElementById('s-err');
+    if(!name){ err.textContent = 'Введіть назву каталогу.'; return; }
+    if(pass.length < 4){ err.textContent = "Пароль — мінімум 4 символи."; return; }
+    if(pass !== pass2){ err.textContent = 'Паролі не збігаються.'; return; }
+    const passwordHash = await hashPass(pass);
+    settings = { name, tagline: tag, contact, passwordHash };
+    await storeSet(STORE_TITLE_KEY, settings);
+    await storeSet(INDEX_KEY, []);
+    index = [];
+    isAdmin = true;
+    products = {};
+    render();
+  };
+}
+
+function contactHref(contact){
+  if(!contact) return null;
+  if(/^\+?\d[\d\s\-]{6,}$/.test(contact)) return 'tel:' + contact.replace(/[^\d+]/g,'');
+  return contact;
+}
+
+function getFilteredIds(){
+  return index.filter(id => {
+    const p = products[id];
+    if(!p) return false;
+    if(!showSold && p.status === 'sold') return false;
+    if(filterCat !== 'Всі' && p.category !== filterCat) return false;
+    if(searchQ){
+      const hay = (p.title+' '+p.description).toLowerCase();
+      if(!hay.includes(searchQ.toLowerCase())) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  const categories = ['Всі','Жіноче','Чоловіче','Дитяче','Унісекс'];
+  const filtered = getFilteredIds();
+  const contact = contactHref(settings.contact);
+
+  app.innerHTML = `
+    <header class="shop-head">
+      <div>
+        <h1 class="shop-name">${escapeHtml(settings.name)}</h1>
+        ${settings.tagline ? `<p class="shop-tagline">${escapeHtml(settings.tagline)}</p>` : ''}
+      </div>
+      <div class="head-actions">
+        ${contact ? `<a class="btn" href="${escapeHtml(contact)}" target="_blank" rel="noopener">Написати</a>` : ''}
+      </div>
+    </header>
+
+    <div class="controls">
+      <input type="text" class="search-input" id="search" placeholder="Пошук за назвою або описом" value="${escapeHtml(searchQ)}">
+      ${categories.map(c => `<button class="chip${c===filterCat?' active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}
+      <label class="toggle-sold"><input type="checkbox" id="show-sold" ${showSold?'checked':''}> Показувати продане</label>
+    </div>
+
+    ${filtered.length === 0 ? `
+      <div class="empty-state">
+        <h3>${index.length === 0 ? 'Поки що тут порожньо' : 'Нічого не знайдено'}</h3>
+        <p>${index.length === 0 ? (isAdmin ? 'Додайте першу пару взуття кнопкою нижче.' : "Скоро тут з'явиться взуття.") : 'Спробуйте змінити пошук або фільтр.'}</p>
+      </div>
+    ` : `<div class="grid">${filtered.map(id => cardHtml(products[id])).join('')}</div>`}
+  `;
+
+  document.getElementById('search').oninput = e => { searchQ = e.target.value; render(); };
+  document.querySelectorAll('.chip').forEach(el => el.onclick = () => { filterCat = el.dataset.cat; render(); });
+  document.getElementById('show-sold').onchange = e => { showSold = e.target.checked; render(); };
+
+  document.querySelectorAll('[data-nav]').forEach(el => el.onclick = () => cycleCardPhoto(el.dataset.nav, parseInt(el.dataset.dir,10)));
+  document.querySelectorAll('[data-zoom]').forEach(el => el.onclick = () => openLightbox(el.dataset.zoom));
+
+  if(isAdmin){
+    document.querySelectorAll('[data-edit]').forEach(el => el.onclick = () => openProductModal(el.dataset.edit));
+    document.querySelectorAll('[data-delete]').forEach(el => el.onclick = () => confirmDelete(el.dataset.delete));
+  }
+
+  renderDock();
+}
+
+function cardHtml(p){
+  if(!p) return '';
+  const photos = getPhotos(p);
+  cardPhotoIndex[p.id] = 0;
+  const photoInner = photos.length
+    ? `<img class="card-photo" id="photo-${p.id}" src="${photos[0]}" alt="${escapeHtml(p.title)}" data-zoom="${p.id}">`
+    : `<div class="card-photo empty">Без фото</div>`;
+  const nav = photos.length > 1 ? `
+      <button class="photo-nav prev" data-nav="${p.id}" data-dir="-1" aria-label="Попереднє фото">‹</button>
+      <button class="photo-nav next" data-nav="${p.id}" data-dir="1" aria-label="Наступне фото">›</button>
+      <div class="photo-dots" id="dots-${p.id}">${photos.map((_,i)=>`<span style="opacity:${i===0?1:.4}"></span>`).join('')}</div>
+    ` : '';
+  return `
+    <div class="card">
+      ${p.status === 'sold' ? `<div class="stamp">продано</div>` : ''}
+      <div class="photo-box">${photoInner}${nav}</div>
+      <h3 class="card-title">${escapeHtml(p.title)}</h3>
+      ${p.description ? `<p class="card-desc">${escapeHtml(p.description)}</p>` : ''}
+      <div class="card-meta">
+        <span class="card-price mono">${escapeHtml(p.price || '—')}</span>
+        ${p.sizes ? `<span class="card-size">р. ${escapeHtml(p.sizes)}</span>` : ''}
+      </div>
+      ${p.category ? `<div class="card-cat">${escapeHtml(p.category)}</div>` : ''}
+      ${isAdmin ? `
+        <div class="card-admin-row">
+          <button class="btn small" data-edit="${p.id}">Змінити</button>
+          <button class="btn small ghost" data-delete="${p.id}">Видалити</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function cycleCardPhoto(id, dir){
+  const p = products[id];
+  if(!p) return;
+  const photos = getPhotos(p);
+  if(photos.length < 2) return;
+  const cur = ((cardPhotoIndex[id]||0) + dir + photos.length) % photos.length;
+  cardPhotoIndex[id] = cur;
+  const img = document.getElementById('photo-'+id);
+  if(img) img.src = photos[cur];
+  const dotsWrap = document.getElementById('dots-'+id);
+  if(dotsWrap){
+    Array.from(dotsWrap.children).forEach((d,i)=> d.style.opacity = i===cur ? '1' : '.4');
+  }
+}
+
+function openLightbox(id){
+  const p = products[id];
+  if(!p) return;
+  const photos = getPhotos(p);
+  if(!photos.length) return;
+  let idx = cardPhotoIndex[id] || 0;
+
+  const bg = document.createElement('div');
+  bg.className = 'lightbox-bg';
+  const renderInner = () => {
+    bg.innerHTML = `
+      <div class="lightbox-img-wrap">
+        <img class="lightbox-img" src="${photos[idx]}" alt="${escapeHtml(p.title)}">
+        <button class="lightbox-close" id="lb-close" aria-label="Закрити">×</button>
+        ${photos.length > 1 ? `
+          <button class="lightbox-nav prev" id="lb-prev" aria-label="Попереднє фото">‹</button>
+          <button class="lightbox-nav next" id="lb-next" aria-label="Наступне фото">›</button>
+          <div class="lightbox-count">${idx+1} / ${photos.length}</div>
+        ` : ''}
+      </div>
+    `;
+    document.getElementById('lb-close').onclick = close;
+    if(photos.length > 1){
+      document.getElementById('lb-prev').onclick = e => { e.stopPropagation(); idx = (idx - 1 + photos.length) % photos.length; cardPhotoIndex[id] = idx; renderInner(); };
+      document.getElementById('lb-next').onclick = e => { e.stopPropagation(); idx = (idx + 1) % photos.length; cardPhotoIndex[id] = idx; renderInner(); };
+    }
+  };
+  const onKey = e => {
+    if(e.key === 'Escape') close();
+    else if(e.key === 'ArrowLeft' && photos.length > 1){ idx = (idx - 1 + photos.length) % photos.length; cardPhotoIndex[id] = idx; renderInner(); }
+    else if(e.key === 'ArrowRight' && photos.length > 1){ idx = (idx + 1) % photos.length; cardPhotoIndex[id] = idx; renderInner(); }
+  };
+  function close(){
+    document.removeEventListener('keydown', onKey);
+    bg.remove();
+    const mainImg = document.getElementById('photo-'+id);
+    const dotsWrap = document.getElementById('dots-'+id);
+    if(mainImg) mainImg.src = photos[idx];
+    if(dotsWrap) Array.from(dotsWrap.children).forEach((d,i)=> d.style.opacity = i===idx ? '1' : '.4');
+  }
+  bg.onclick = e => { if(e.target === bg) close(); };
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(bg);
+  renderInner();
+}
+
+function renderDock(){
+  let dock = document.querySelector('.dock');
+  if(dock) dock.remove();
+  dock = document.createElement('div');
+  dock.className = 'dock';
+  if(isAdmin){
+    dock.innerHTML = `
+      <button class="btn ghost" id="dock-settings">Налаштування</button>
+      <button class="btn ghost" id="dock-logout">Вийти</button>
+      <button class="btn primary" id="dock-add">+ Додати товар</button>
+    `;
+    document.body.appendChild(dock);
+    document.getElementById('dock-add').onclick = () => openProductModal(null);
+    document.getElementById('dock-logout').onclick = () => { isAdmin = false; render(); };
+    document.getElementById('dock-settings').onclick = () => openSettingsModal();
+  } else {
+    dock.innerHTML = `<button class="btn" id="dock-login">Я продавець</button>`;
+    document.body.appendChild(dock);
+    document.getElementById('dock-login').onclick = () => openLoginModal();
+  }
+}
+
+function openLoginModal(){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h2>Вхід для продавця</h2>
+      <p class="sub">Введіть спільний пароль, щоб додавати й редагувати товари.</p>
+      <div class="field">
+        <label for="l-pass">Пароль</label>
+        <input type="password" id="l-pass">
+      </div>
+      <div class="err" id="l-err"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="l-cancel">Скасувати</button>
+        <button class="btn primary" id="l-ok">Увійти</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(bg);
+  const passInput = document.getElementById('l-pass');
+  passInput.focus();
+  const close = () => bg.remove();
+  document.getElementById('l-cancel').onclick = close;
+  bg.onclick = e => { if(e.target === bg) close(); };
+  const tryLogin = async () => {
+    const pw = passInput.value;
+    const h = await hashPass(pw);
+    if(h === settings.passwordHash){
+      isAdmin = true;
+      close();
+      render();
+    } else {
+      document.getElementById('l-err').textContent = 'Невірний пароль.';
+    }
+  };
+  document.getElementById('l-ok').onclick = tryLogin;
+  passInput.onkeydown = e => { if(e.key === 'Enter') tryLogin(); };
+}
+
+function openSettingsModal(){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h2>Налаштування каталогу</h2>
+      <div class="field">
+        <label for="st-name">Назва</label>
+        <input type="text" id="st-name" value="${escapeHtml(settings.name)}">
+      </div>
+      <div class="field">
+        <label for="st-tag">Короткий опис</label>
+        <input type="text" id="st-tag" value="${escapeHtml(settings.tagline||'')}">
+      </div>
+      <div class="field">
+        <label for="st-contact">Посилання для зв'язку</label>
+        <input type="url" id="st-contact" value="${escapeHtml(settings.contact||'')}" placeholder="https://wa.me/380...">
+      </div>
+      <div class="field">
+        <label for="st-pass">Новий пароль (необов'язково)</label>
+        <input type="password" id="st-pass" placeholder="Залиште порожнім, якщо не змінюєте">
+      </div>
+      <div class="err" id="st-err"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="st-cancel">Скасувати</button>
+        <button class="btn primary" id="st-save">Зберегти</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(bg);
+  document.getElementById('st-cancel').onclick = () => bg.remove();
+  bg.onclick = e => { if(e.target === bg) bg.remove(); };
+  document.getElementById('st-save').onclick = async () => {
+    const name = document.getElementById('st-name').value.trim();
+    if(!name){ document.getElementById('st-err').textContent = 'Назва не може бути порожньою.'; return; }
+    settings.name = name;
+    settings.tagline = document.getElementById('st-tag').value.trim();
+    settings.contact = document.getElementById('st-contact').value.trim();
+    const newPass = document.getElementById('st-pass').value;
+    if(newPass){
+      if(newPass.length < 4){ document.getElementById('st-err').textContent = "Пароль — мінімум 4 символи."; return; }
+      settings.passwordHash = await hashPass(newPass);
+    }
+    await storeSet(STORE_TITLE_KEY, settings);
+    bg.remove();
+    render();
+  };
+}
+
+function fileToCompressedDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        const maxW = 1000;
+        if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        let quality = 0.78;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        while(dataUrl.length > 1200000 && quality > 0.35){
+          quality -= 0.1;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error('image load failed'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('file read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderPhotoArea(){
+  const area = document.getElementById('photo-area');
+  if(!area) return;
+  area.innerHTML = `
+    ${pendingPhotos.length ? `<div class="thumbs" id="thumbs">${pendingPhotos.map((src,i) => `
+      <div class="thumb-item">
+        <img src="${src}">
+        <button type="button" class="thumb-remove" data-remove="${i}" aria-label="Видалити фото">×</button>
+      </div>
+    `).join('')}</div>` : ''}
+    <div class="photo-drop" id="photo-drop">${pendingPhotos.length ? 'Додати ще фото' : 'Натисніть, щоб додати фото (можна декілька)'}</div>
+    <input type="file" accept="image/*" id="photo-file" multiple style="display:none;">
+  `;
+  document.getElementById('photo-drop').onclick = () => document.getElementById('photo-file').click();
+  document.getElementById('photo-file').onchange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if(!files.length) return;
+    document.getElementById('photo-drop').textContent = 'Обробляємо фото…';
+    for(const file of files){
+      try{
+        const dataUrl = await fileToCompressedDataUrl(file);
+        pendingPhotos.push(dataUrl);
+      }catch(err){}
+    }
+    renderPhotoArea();
+  };
+  area.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.onclick = () => {
+      pendingPhotos.splice(parseInt(btn.dataset.remove,10), 1);
+      renderPhotoArea();
+    };
+  });
+}
+
+function openProductModal(id){
+  editingId = id;
+  const p = id ? products[id] : { title:'', description:'', price:'', sizes:'', category:'Жіноче', status:'available', photos:[] };
+  pendingPhotos = getPhotos(p).slice();
+
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h2>${id ? 'Змінити товар' : 'Новий товар'}</h2>
+      <div class="field">
+        <label>Фото (можна додати декілька)</label>
+        <div id="photo-area"></div>
+      </div>
+      <div class="field">
+        <label for="p-title">Назва</label>
+        <input type="text" id="p-title" placeholder="Наприклад: Кросівки Nike Air, білі" value="${escapeHtml(p.title)}">
+      </div>
+      <div class="field">
+        <label for="p-desc">Опис</label>
+        <textarea id="p-desc" placeholder="Стан, матеріал, особливості…">${escapeHtml(p.description)}</textarea>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="p-price">Ціна</label>
+          <input type="text" id="p-price" placeholder="Наприклад: 800 грн" value="${escapeHtml(p.price)}">
+        </div>
+        <div class="field">
+          <label for="p-sizes">Розмір</label>
+          <input type="text" id="p-sizes" placeholder="Наприклад: 38" value="${escapeHtml(p.sizes)}">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="p-cat">Категорія</label>
+          <select id="p-cat">
+            ${['Жіноче','Чоловіче','Дитяче','Унісекс'].map(c => `<option ${c===p.category?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label for="p-status">Статус</label>
+          <select id="p-status">
+            <option value="available" ${p.status==='available'?'selected':''}>В наявності</option>
+            <option value="sold" ${p.status==='sold'?'selected':''}>Продано</option>
+          </select>
+        </div>
+      </div>
+      <div class="err" id="p-err"></div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="p-cancel">Скасувати</button>
+        <button class="btn primary" id="p-save">Зберегти</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(bg);
+  renderPhotoArea();
+  document.getElementById('p-cancel').onclick = () => bg.remove();
+  bg.onclick = e => { if(e.target === bg) bg.remove(); };
+
+  document.getElementById('p-save').onclick = async () => {
+    const title = document.getElementById('p-title').value.trim();
+    if(!title){ document.getElementById('p-err').textContent = 'Введіть назву товару.'; return; }
+    const product = {
+      id: id || uid(),
+      title,
+      description: document.getElementById('p-desc').value.trim(),
+      price: document.getElementById('p-price').value.trim(),
+      sizes: document.getElementById('p-sizes').value.trim(),
+      category: document.getElementById('p-cat').value,
+      status: document.getElementById('p-status').value,
+      photos: pendingPhotos.slice(),
+      createdAt: p.createdAt || Date.now()
+    };
+    await storeSet(productKey(product.id), product);
+    products[product.id] = product;
+    if(!id){
+      index.unshift(product.id);
+      await storeSet(INDEX_KEY, index);
+    }
+    bg.remove();
+    render();
+  };
+}
+
+function confirmDelete(id){
+  const p = products[id];
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal" style="max-width:360px;">
+      <h2>Видалити товар?</h2>
+      <p class="sub">«${escapeHtml(p ? p.title : '')}» буде видалено без можливості відновити.</p>
+      <div class="modal-actions">
+        <button class="btn ghost" id="d-cancel">Скасувати</button>
+        <button class="btn primary" id="d-ok" style="background:var(--rust);border-color:var(--rust);">Видалити</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(bg);
+  document.getElementById('d-cancel').onclick = () => bg.remove();
+  bg.onclick = e => { if(e.target === bg) bg.remove(); };
+  document.getElementById('d-ok').onclick = async () => {
+    await storeDelete(productKey(id));
+    delete products[id];
+    index = index.filter(x => x !== id);
+    await storeSet(INDEX_KEY, index);
+    bg.remove();
+    render();
+  };
+}
+
+boot();
+</script>
+</body>
+</html>
